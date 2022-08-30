@@ -3,17 +3,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #Load Image
-#Load Image
-# def read_file(image):
-input_file = sys.argv[1]
-img = cv2.imread(input_file)
-img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+def read_file(img):
+    input_file = sys.argv[1]
+    img = cv2.imread(input_file)
+    img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
     # plt.imshow(img)
     # plt.show()
     # return img
 
     # filename = "download.jpg"
-org_img = np.copy(img)
+    org_img = np.copy(img)
 
 #Create Edge Mask
 def edge_mask(img, line_size, blur_value):
