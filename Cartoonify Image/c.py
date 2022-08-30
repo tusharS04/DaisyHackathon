@@ -3,16 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #Load Image
-def read_file(img):
-    input_file = sys.argv[1]
-    img = cv2.imread(input_file)
-    img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-    # plt.imshow(img)
-    # plt.show()
-    # return img
-
-    # filename = "download.jpg"
-    org_img = np.copy(img)
+def read_file(filename):
+  img = cv2.imread(filename)
+  cv2_imshow(img)
+  org_img = np.copy(img)
+  return img
 
 #Create Edge Mask
 def edge_mask(img, line_size, blur_value):
@@ -52,12 +47,13 @@ def color_quantizaion(img, k):
 def cartoon():
     c = cv2.bilateralFilter(img, d=3, sigmaColor=200, sigmaSpace=200)
 
-    plt.imshow(org_img)
-    plt.title("Original Image")
-    plt.show()
+#     plt.imshow(org_img)
+#     plt.title("Original Image")
+#     plt.show()
 
     plt.imshow(c)
     plt.title("Cartoonified Image")
     plt.show()
+    return c
 
     cartoon()
