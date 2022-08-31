@@ -4,27 +4,66 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
+#Load Image
+def read_file(img):
+    input_file = sys.argv[1]
+    img = cv2.imread(input_file)
+    img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+    org_img = np.copy(img)
+    plt.imshow(img)
+    plt.show()
+    return img
 
-def cartoonify(image):
-    input_file = Image.open(sys.argv[1])
-    imgage = cv2.imread(input_file)
-    imgage = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-    plt.figure(figsize=(10,10))
+#Create Edge Mask
+def edge_mask(img, line_size, blur_value):
+    """
+    input: Input Image
+    Output: Edges of Image
+    """
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    gray_blur = cv2.medianBlur(gray, blur_value)
 
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    gray = cv2.medianBlur(gray, 5)
-    plt.figure(figsize=(10,10))
-    plt.imshow(gray,cmap="gray")
+    edges = cv2.adaptiveThreshold(gray_blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, line_size, blur_value)
+    return edges
 
-    edges = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 9)
-    plt.figure(figsize=(10,10))
-    plt.imshow(edges,cmap="gray")
+line_size, blur_value = 5,7
+edges = edge_mask(img, line_size, blur_value)
 
-    color = cv2.bilateralFilter(img, 9, 250, 250)
-    cartoon = cv2.bitwise_and(color, color, mask=edges)
-    plt.figure(figsize=(10,10))
-    plt.imshow(cartoon,cmap="gray")
+plt.imshow(edges, cmap="binary")
+plt.show()
 
-    final = deepcopy(cartoon)
+#Reduce the Color Palette
+def color_quantizaion(img, k):
+    # Transform the image
+    data = np.float32(img).reshape((-1,3))
 
-    return final
+    #Determine Criteria
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 20, 0.001)
+
+    # Implementing K-Means
+    ret, label, center = cv2.kmeans(data, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+    center = np.uint8(center)
+
+    result = center[label.flatten()]
+    result = result.reshape(img.shape)
+
+    return result
+
+img = color_quantizaion(img, k=9)
+
+plt.imshow(img)
+plt.show()
+
+# Combine Original Image with Cartoon Image
+def cartoon():
+    c = cv2.bilateralFilter(img, d=3, sigmaColor=200, sigmaSpace=200)
+
+    plt.imshow(org_img)
+    plt.title("Original Image")
+    plt.show()
+
+    plt.imshow(c)
+    plt.title("Cartoonified Image")
+    plt.show()
+
+cartoon()
